@@ -15,7 +15,7 @@ services:
         sync: false # Render will prompt you for this value during deployment
       - key: REDIS_URL
         fromService:
-          type: redis
+          type: keyvalue
           name: deployguard-redis
           property: connectionString
       - key: STRIPE_SECRET_KEY
@@ -25,7 +25,7 @@ services:
       - key: FRONTEND_URL
         sync: false # Set this to your Vercel frontend URL after deploying the frontend
 
-  - type: redis
+  - type: keyvalue
     name: deployguard-redis
     plan: free
     ipAllowList: [] # Restricts access to internal services only
