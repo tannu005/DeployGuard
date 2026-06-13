@@ -54,7 +54,6 @@ graph TD
 ### 4. Direct Stripe Billing & Webhook Fallback
 * Integrates **Stripe Checkout** for Pro and Enterprise subscriptions.
 * **Local Verification Fallback**: Includes a custom session verification query pattern (`/verify-session`) that resolves Stripe Checkout sessions directly via the Stripe SDK. This enables developers to test payments end-to-end locally without needing public webhook tunnels (like ngrok).
-* **Developer Bypass Mode**: Restricted admin endpoint `/grant-dev-license` allows the registered developer email (`ytannu1410@gmail.com`) to instantly bypass Stripe and activate a 10-year Enterprise test subscription.
 
 ### 5. SOC2 & ISO27001 Compliance Audits
 * Generates audit logs containing pipeline scan status, critical findings, and remediation history.
