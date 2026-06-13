@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://deployguard:supersecret@db:5432/deployguard
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      - db
+      - redis
+    restart: always
+
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: deployguard
+      POSTGRES_PASSWORD: supersecret
+      POSTGRES_DB: deployguard
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    restart: always
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redisdata:/data
+    restart: always
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_API_URL=http://localhost:3001
+    depends_on:
+      - backend
+    restart: always
+
+volumes:
+  pgdata:
+  redisdata:

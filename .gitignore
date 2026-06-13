@@ -1,0 +1,40 @@
+# Dependencies
+node_modules/
+
+# Production Build Outputs
+.next/
+out/
+dist/
+build/
+dist-backend/
+
+# Local Configuration & Environment Files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.env
+
+# System Files & Logs
+.DS_Store
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.lerna/
+.yarn/
+
+# IDEs and Editors
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# SQLite databases (if any)
+*.db
+*.db-journal

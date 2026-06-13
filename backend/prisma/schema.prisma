@@ -1,0 +1,78 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Organization {
+  id        String   @id @default(uuid())
+  name      String
+  createdAt DateTime @default(now())
+  teams     Team[]
+}
+
+model Team {
+  id             String         @id @default(uuid())
+  name           String
+  organizationId String
+  organization   Organization   @relation(fields: [organizationId], references: [id])
+  users          User[]
+  analyses       PipelineAnalysis[]
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  role      String   @default("VIEWER") // ADMIN, EDITOR, VIEWER
+  teamId    String?
+  team      Team?    @relation(fields: [teamId], references: [id])
+}
+
+model PipelineAnalysis {
+  id                          String   @id @default(uuid())
+  workflowFile                String
+  totalIssues                 Int
+  criticalIssues              Int
+  estimatedTimeSavingsS       Int
+  estimatedCostSavingsPercent Float
+  issues                      PipelineIssue[]
+  metrics                     PipelineMetric[]
+  createdAt                   DateTime @default(now())
+  teamId                      String?
+  team                        Team?    @relation(fields: [teamId], references: [id])
+}
+
+model PipelineIssue {
+  id                 String           @id @default(uuid())
+  ruleId             String
+  severity           String
+  description        String
+  suggestion         String
+  line               Int?
+  pipelineAnalysisId String
+  pipelineAnalysis   PipelineAnalysis @relation(fields: [pipelineAnalysisId], references: [id], onDelete: Cascade)
+}
+
+model PipelineMetric {
+  id                 String           @id @default(uuid())
+  name               String
+  value              Float
+  unit               String
+  pipelineAnalysisId String
+  pipelineAnalysis   PipelineAnalysis @relation(fields: [pipelineAnalysisId], references: [id], onDelete: Cascade)
+}
+
+model Subscription {
+  id                    String   @id @default(uuid())
+  email                 String   @unique
+  stripeCustomerId      String   @unique
+  stripeSubscriptionId  String?  @unique
+  plan                  String   @default("FREE") // FREE, PRO, ENTERPRISE
+  status                String   @default("ACTIVE") // ACTIVE, CANCELLED, PAST_DUE
+  currentPeriodEnd      DateTime?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+}
