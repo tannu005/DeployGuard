@@ -295,11 +295,11 @@ export default function Home() {
 
           {/* Interactive Multi-Select Service Pills */}
           <motion.div 
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            className="py-24 md:py-32 border-t border-[#F1F3F1] my-8 w-full"
+            viewport={{ once: false, amount: 0.25 }}
+            transition={{ duration: 1.0, ease: [0.16, 1, 0.3, 1] }}
+            className="py-16 md:py-20 border-t border-[#F1F3F1] my-4 w-full"
           >
             <h3 className="text-2xl font-medium tracking-tight mb-2 shiny-text">What sort of validation?</h3>
             <p className="opacity-85 text-[#738273] mb-8">Select all that apply</p>
@@ -333,11 +333,11 @@ export default function Home() {
 
           {/* Minimalist How It Works Section */}
           <motion.div 
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            className="py-24 md:py-32 border-t border-[#F1F3F1] my-8"
+            viewport={{ once: false, amount: 0.25 }}
+            transition={{ duration: 1.0, ease: [0.16, 1, 0.3, 1] }}
+            className="py-16 md:py-20 border-t border-[#F1F3F1] my-4"
           >
             <h3 className="text-2xl font-medium tracking-tight mb-8 shiny-text">How it works</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -361,11 +361,11 @@ export default function Home() {
 
           {/* Enterprise Features Section */}
           <motion.div 
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            className="py-24 md:py-32 border-t border-[#F1F3F1] my-8"
+            viewport={{ once: false, amount: 0.25 }}
+            transition={{ duration: 1.0, ease: [0.16, 1, 0.3, 1] }}
+            className="py-16 md:py-20 border-t border-[#F1F3F1] my-4"
           >
             <div className="flex items-center gap-4 mb-8">
               <h3 className="text-2xl font-medium tracking-tight shiny-text">Enterprise Capabilities</h3>
@@ -443,11 +443,11 @@ export default function Home() {
           {/* True Full-Stack Analyzer */}
           <motion.div 
             id="analyzer" 
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            className="w-full max-w-4xl py-24 md:py-32 border-t border-[#F1F3F1] my-8"
+            viewport={{ once: false, amount: 0.25 }}
+            transition={{ duration: 1.0, ease: [0.16, 1, 0.3, 1] }}
+            className="w-full max-w-4xl py-16 md:py-20 border-t border-[#F1F3F1] my-4"
           >
             <h3 className="text-2xl font-medium tracking-tight mb-2 shiny-text">Pipeline Configuration</h3>
             <p className="opacity-85 text-[#738273] mb-8">Paste your YAML file below or scan a GitHub repository to trigger the real DevSecOps validation engine.</p>
@@ -690,11 +690,11 @@ export default function Home() {
           {/* Documentation Section */}
           <motion.section 
             id="docs"
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            className="w-full max-w-4xl py-24 md:py-32 border-t border-[#F1F3F1] my-8"
+            viewport={{ once: false, amount: 0.25 }}
+            transition={{ duration: 1.0, ease: [0.16, 1, 0.3, 1] }}
+            className="w-full max-w-4xl py-16 md:py-20 border-t border-[#F1F3F1] my-4"
           >
             <span className="px-3 py-1 bg-[#FAFBF9] border border-[#F1F3F1] text-[11px] font-semibold uppercase tracking-widest rounded-full text-[#1C2E1E]">Documentation</span>
             <h2 className="text-3xl md:text-4xl font-normal tracking-tight shiny-text pb-2 mt-4 mb-6">
@@ -730,11 +730,11 @@ export default function Home() {
           {/* Contact Section */}
           <motion.section 
             id="contact"
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            className="w-full max-w-4xl py-24 md:py-32 border-t border-[#F1F3F1] my-8"
+            viewport={{ once: false, amount: 0.25 }}
+            transition={{ duration: 1.0, ease: [0.16, 1, 0.3, 1] }}
+            className="w-full max-w-4xl py-16 md:py-20 border-t border-[#F1F3F1] my-4"
           >
             <div className="bg-[#1C2E1E] text-white p-8 md:p-12 rounded-3xl relative overflow-hidden group shadow-lg">
               <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl group-hover:bg-emerald-500/20 transition-all duration-700 pointer-events-none"></div>
@@ -749,7 +749,7 @@ export default function Home() {
                 </div>
                 
                 <a 
-                  href="https://www.linkedin.com/in/tannu005" 
+                  href="https://www.linkedin.com/in/tannu-yadav-06012733a/" 
                   target="_blank" 
                   rel="noreferrer"
                   className="inline-flex items-center gap-2 px-6 py-3 bg-white text-black font-semibold rounded-full hover:bg-neutral-100 transition-all transform active:scale-95 shadow-md flex-shrink-0"
