@@ -30,19 +30,27 @@ export function ValidationReport({
   
   const getSeverityStyles = (severity: string) => {
     switch(severity) {
-      case 'CRITICAL': return 'border-l-red-500 bg-red-500/5 text-red-200 border-t-white/5 border-r-white/5 border-b-white/5';
-      case 'HIGH': return 'border-l-orange-500 bg-orange-500/5 text-orange-200 border-t-white/5 border-r-white/5 border-b-white/5';
-      case 'MEDIUM': return 'border-l-yellow-500 bg-yellow-500/5 text-yellow-200 border-t-white/5 border-r-white/5 border-b-white/5';
-      default: return 'border-l-blue-500 bg-blue-500/5 text-blue-200 border-t-white/5 border-r-white/5 border-b-white/5';
+      case 'CRITICAL': 
+        return 'border-l-red-500 bg-red-50/20 text-neutral-800 border-y-[#F1F3F1] border-r-[#F1F3F1]';
+      case 'HIGH': 
+        return 'border-l-orange-500 bg-orange-50/20 text-neutral-800 border-y-[#F1F3F1] border-r-[#F1F3F1]';
+      case 'MEDIUM': 
+        return 'border-l-amber-500 bg-amber-50/20 text-neutral-800 border-y-[#F1F3F1] border-r-[#F1F3F1]';
+      default: 
+        return 'border-l-sky-500 bg-sky-50/20 text-neutral-800 border-y-[#F1F3F1] border-r-[#F1F3F1]';
     }
   };
 
   const getSeverityBadge = (severity: string) => {
     switch(severity) {
-      case 'CRITICAL': return 'bg-red-500/20 text-red-400 border border-red-500/20';
-      case 'HIGH': return 'bg-orange-500/20 text-orange-400 border border-orange-500/20';
-      case 'MEDIUM': return 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/20';
-      default: return 'bg-blue-500/20 text-blue-400 border border-blue-500/20';
+      case 'CRITICAL': 
+        return 'bg-red-100 text-red-800 border border-red-200';
+      case 'HIGH': 
+        return 'bg-orange-100 text-orange-800 border border-orange-200';
+      case 'MEDIUM': 
+        return 'bg-amber-100 text-amber-800 border border-amber-200';
+      default: 
+        return 'bg-sky-100 text-sky-800 border border-sky-200';
     }
   };
 
@@ -50,33 +58,37 @@ export function ValidationReport({
     <div className="w-full">
       {/* Overview Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-        <div className="bg-slate-900/50 backdrop-blur-xl border border-white/10 p-6 rounded-2xl flex items-center gap-4 hover:border-violet-500/30 transition-colors group">
+        
+        {/* Critical Card */}
+        <div className="bg-[#FAFBF9] border border-[#F1F3F1] p-6 rounded-2xl flex items-center gap-4 hover:border-red-500/20 transition-colors group">
           <div className="p-3 bg-red-500/10 rounded-xl group-hover:scale-110 transition-transform">
-            <ShieldAlert className="w-6 h-6 text-red-400" />
+            <ShieldAlert className="w-6 h-6 text-red-600" />
           </div>
           <div>
-            <p className="text-sm text-slate-400 font-medium">Critical Issues</p>
-            <p className="text-2xl font-bold text-slate-100">{report.criticalIssues}</p>
+            <p className="text-sm text-[#5A635A] font-medium">Critical Issues</p>
+            <p className="text-2xl font-bold text-black">{report.criticalIssues}</p>
           </div>
         </div>
 
-        <div className="bg-slate-900/50 backdrop-blur-xl border border-white/10 p-6 rounded-2xl flex items-center gap-4 hover:border-violet-500/30 transition-colors group">
-          <div className="p-3 bg-fuchsia-500/10 rounded-xl group-hover:scale-110 transition-transform">
-            <Zap className="w-6 h-6 text-fuchsia-400" />
-          </div>
-          <div>
-            <p className="text-sm text-slate-400 font-medium">Est. Time Savings</p>
-            <p className="text-2xl font-bold text-slate-100">{report.timeSavings}</p>
-          </div>
-        </div>
-
-        <div className="bg-slate-900/50 backdrop-blur-xl border border-white/10 p-6 rounded-2xl flex items-center gap-4 hover:border-violet-500/30 transition-colors group">
+        {/* Est. Time Savings Card */}
+        <div className="bg-[#FAFBF9] border border-[#F1F3F1] p-6 rounded-2xl flex items-center gap-4 hover:border-[#1C2E1E]/20 transition-colors group">
           <div className="p-3 bg-emerald-500/10 rounded-xl group-hover:scale-110 transition-transform">
-            <DollarSign className="w-6 h-6 text-emerald-400" />
+            <Zap className="w-6 h-6 text-emerald-700" />
           </div>
           <div>
-            <p className="text-sm text-slate-400 font-medium">Est. Cost Savings</p>
-            <p className="text-2xl font-bold text-slate-100">{report.costSavings}</p>
+            <p className="text-sm text-[#5A635A] font-medium">Est. Time Savings</p>
+            <p className="text-2xl font-bold text-black">{report.timeSavings}</p>
+          </div>
+        </div>
+
+        {/* Est. Cost Savings Card */}
+        <div className="bg-[#FAFBF9] border border-[#F1F3F1] p-6 rounded-2xl flex items-center gap-4 hover:border-[#1C2E1E]/20 transition-colors group">
+          <div className="p-3 bg-emerald-500/10 rounded-xl group-hover:scale-110 transition-transform">
+            <DollarSign className="w-6 h-6 text-emerald-700" />
+          </div>
+          <div>
+            <p className="text-sm text-[#5A635A] font-medium">Est. Cost Savings</p>
+            <p className="text-2xl font-bold text-black">{report.costSavings}</p>
           </div>
         </div>
       </div>
@@ -108,24 +120,24 @@ Generated by DeployGuard Enterprise Compliance Engine.`;
               link.click();
               URL.revokeObjectURL(url);
             }}
-            className="flex items-center gap-2 px-5 py-2.5 bg-violet-600 hover:bg-violet-700 text-white font-medium text-xs rounded-full shadow-lg transition-all active:scale-95"
+            className="flex items-center gap-2 px-5 py-2.5 bg-[#1C2E1E] hover:bg-black text-white font-medium text-xs rounded-full shadow-lg transition-all active:scale-95"
           >
-            <Shield className="w-4 h-4" /> Export SOC2 Compliance Report
+            <Shield className="w-4 h-4 text-emerald-400" /> Export SOC2 Compliance Report
           </button>
         </div>
       )}
 
       {/* Issues List */}
-      <div className="bg-slate-900/50 backdrop-blur-xl border border-white/10 rounded-2xl overflow-hidden">
-        <div className="px-6 py-4 border-b border-white/10 bg-slate-900/80 flex items-center gap-2">
-          <Shield className="w-5 h-5 text-violet-400" />
-          <h3 className="font-semibold text-slate-100">Security & Optimization Findings</h3>
+      <div className="bg-white border border-[#F1F3F1] rounded-2xl overflow-hidden shadow-sm">
+        <div className="px-6 py-4 border-b border-[#F1F3F1] bg-[#FAFBF9] flex items-center gap-2">
+          <Shield className="w-5 h-5 text-[#1C2E1E]" />
+          <h3 className="font-semibold text-black">Security & Optimization Findings</h3>
         </div>
         
-        <div className="p-6 space-y-4 max-h-[500px] overflow-y-auto custom-scrollbar">
+        <div className="p-6 space-y-4 max-h-[500px] overflow-y-auto custom-scrollbar bg-white">
           {report.issues.length === 0 ? (
-            <div className="text-center py-12 text-slate-500">
-              <ShieldCheck className="w-12 h-12 mx-auto mb-3 text-emerald-500/50" />
+            <div className="text-center py-12 text-[#738273]">
+              <ShieldCheck className="w-12 h-12 mx-auto mb-3 text-emerald-600/60" />
               <p>No issues found! Your pipeline is pristine.</p>
             </div>
           ) : (
@@ -136,27 +148,27 @@ Generated by DeployGuard Enterprise Compliance Engine.`;
               >
                 <div className="flex justify-between items-start mb-2">
                   <div className="flex items-center gap-3">
-                    <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold tracking-wide ${getSeverityBadge(issue.severity)}`}>
+                    <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold tracking-wide ${getSeverityBadge(issue.severity)}`}>
                       {issue.severity}
                     </span>
-                    <span className="font-mono text-sm opacity-60 bg-black/20 px-2 py-0.5 rounded">{issue.ruleId}</span>
+                    <span className="font-mono text-xs text-[#738273] bg-[#FAFBF9] border border-[#F1F3F1] px-2 py-0.5 rounded">{issue.ruleId}</span>
                   </div>
                   {issue.line && (
-                    <span className="text-xs font-mono opacity-50 flex items-center gap-1">
+                    <span className="text-xs font-mono text-[#738273] flex items-center gap-1">
                       Line {issue.line}
                     </span>
                   )}
                 </div>
-                <p className="text-sm mt-3 opacity-90 leading-relaxed font-medium">{issue.description}</p>
-                <div className="mt-3 bg-black/20 p-3 rounded-lg flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                <p className="text-sm mt-3 text-neutral-800 leading-relaxed font-normal">{issue.description}</p>
+                <div className="mt-3 bg-[#FAFBF9] border border-[#EAECE9] p-3 rounded-lg flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                   <div className="flex items-start gap-2">
-                    <CloudLightning className="w-4 h-4 mt-0.5 opacity-60 flex-shrink-0" />
-                    <p className="text-sm font-mono opacity-80">{issue.suggestion}</p>
+                    <CloudLightning className="w-4 h-4 mt-0.5 text-[#738273] flex-shrink-0" />
+                    <p className="text-xs font-mono text-[#5A635A]">{issue.suggestion}</p>
                   </div>
                   {isEnterprise && onFixIssue && (
                     <button
                       onClick={() => onFixIssue(issue)}
-                      className="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-xs rounded-full shadow transition-all flex items-center gap-1 self-end sm:self-auto flex-shrink-0"
+                      className="px-3.5 py-1.5 bg-[#1C2E1E] hover:bg-black text-white font-medium text-xs rounded-full shadow transition-all flex items-center gap-1 self-end sm:self-auto flex-shrink-0 active:scale-95"
                     >
                       <Zap className="w-3.5 h-3.5" /> AI Autofix
                     </button>
