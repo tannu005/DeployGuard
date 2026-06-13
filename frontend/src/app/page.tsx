@@ -209,7 +209,7 @@ export default function Home() {
         customRules: subscription?.plan === 'ENTERPRISE' ? customRules : undefined,
       };
       const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-      const response = await axios.post(`${API_URL}/api/v1/payments/analyze`, payload);
+      const response = await axios.post(`${API_URL}/api/v1/pipelines/analyze`, payload);
       
       setJobId(response.data.jobId);
       setShowLogs(true);
