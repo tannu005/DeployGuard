@@ -74,7 +74,7 @@ export default function AnalyticsDashboard() {
         </div>
         
         <div className="hidden md:flex flex-row items-center gap-8 text-[20px] font-medium">
-          <a href="https://github.com/tannu005/DeployGuard" target="_blank" rel="noreferrer" className="cursor-pointer hover:opacity-60 transition-opacity shiny-text">Documentation</a>
+          <Link href="/#docs" className="cursor-pointer hover:opacity-60 transition-opacity shiny-text">Documentation</Link>
           <Link href="/analytics" className="cursor-pointer hover:opacity-60 transition-opacity underline underline-offset-4 shiny-text">Analytics</Link>
           <Link href="/pricing" className="cursor-pointer hover:opacity-60 transition-opacity shiny-text">Pricing</Link>
         </div>

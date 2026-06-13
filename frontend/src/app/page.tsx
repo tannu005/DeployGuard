@@ -248,7 +248,7 @@ export default function Home() {
         </div>
         
         <div className="hidden md:flex flex-row items-center gap-8 text-[20px] font-medium">
-          <a href="https://github.com/tannu005/DeployGuard" target="_blank" rel="noreferrer" className="cursor-pointer hover:opacity-60 transition-opacity shiny-text">Documentation</a>
+          <a href="#docs" className="cursor-pointer hover:opacity-60 transition-opacity shiny-text">Documentation</a>
           <Link href="/analytics" className="cursor-pointer hover:opacity-60 transition-opacity shiny-text">Analytics</Link>
           <Link href="/pricing" className="cursor-pointer hover:opacity-60 transition-opacity shiny-text">Pricing</Link>
         </div>
@@ -270,7 +270,7 @@ export default function Home() {
 
       {/* Mobile Menu Overlay */}
       <div className={`fixed inset-0 z-[15] bg-white/95 backdrop-blur-sm transition-opacity duration-300 md:hidden flex flex-col justify-center items-center gap-8 ${isMobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
-        <a href="https://github.com/tannu005/DeployGuard" target="_blank" rel="noreferrer" className="text-3xl font-medium text-black">Documentation</a>
+        <a href="#docs" onClick={() => setIsMobileMenuOpen(false)} className="text-3xl font-medium text-black">Documentation</a>
         <Link href="/analytics" className="text-3xl font-medium text-black">Analytics</Link>
         <Link href="/pricing" onClick={() => setIsMobileMenuOpen(false)} className="text-3xl font-medium text-black">Pricing</Link>
         <a href="#analyzer" onClick={() => setIsMobileMenuOpen(false)} className="mt-8 px-6 py-3 bg-black text-white rounded-full">Scan Pipeline</a>
@@ -294,7 +294,13 @@ export default function Home() {
           </motion.div>
 
           {/* Interactive Multi-Select Service Pills */}
-          <div className="mb-24">
+          <motion.div 
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            className="py-24 md:py-32 border-t border-[#F1F3F1] my-8 w-full"
+          >
             <h3 className="text-2xl font-medium tracking-tight mb-2 shiny-text">What sort of validation?</h3>
             <p className="opacity-85 text-[#738273] mb-8">Select all that apply</p>
             
@@ -323,15 +329,15 @@ export default function Home() {
                 );
               })}
             </div>
-          </div>
+          </motion.div>
 
           {/* Minimalist How It Works Section */}
           <motion.div 
-            initial={{ opacity: 0, y: 40 }}
+            initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.7 }}
-            className="mb-24 py-12 border-y border-[#F1F3F1]"
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            className="py-24 md:py-32 border-t border-[#F1F3F1] my-8"
           >
             <h3 className="text-2xl font-medium tracking-tight mb-8 shiny-text">How it works</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -355,11 +361,11 @@ export default function Home() {
 
           {/* Enterprise Features Section */}
           <motion.div 
-            initial={{ opacity: 0, y: 40 }}
+            initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.7 }}
-            className="mb-24 py-12"
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            className="py-24 md:py-32 border-t border-[#F1F3F1] my-8"
           >
             <div className="flex items-center gap-4 mb-8">
               <h3 className="text-2xl font-medium tracking-tight shiny-text">Enterprise Capabilities</h3>
@@ -437,11 +443,11 @@ export default function Home() {
           {/* True Full-Stack Analyzer */}
           <motion.div 
             id="analyzer" 
-            initial={{ opacity: 0, y: 40 }}
+            initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.7 }}
-            className="w-full max-w-4xl"
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            className="w-full max-w-4xl py-24 md:py-32 border-t border-[#F1F3F1] my-8"
           >
             <h3 className="text-2xl font-medium tracking-tight mb-2 shiny-text">Pipeline Configuration</h3>
             <p className="opacity-85 text-[#738273] mb-8">Paste your YAML file below or scan a GitHub repository to trigger the real DevSecOps validation engine.</p>
@@ -680,6 +686,79 @@ export default function Home() {
               )}
             </>
           )}
+
+          {/* Documentation Section */}
+          <motion.section 
+            id="docs"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            className="w-full max-w-4xl py-24 md:py-32 border-t border-[#F1F3F1] my-8"
+          >
+            <span className="px-3 py-1 bg-[#FAFBF9] border border-[#F1F3F1] text-[11px] font-semibold uppercase tracking-widest rounded-full text-[#1C2E1E]">Documentation</span>
+            <h2 className="text-3xl md:text-4xl font-normal tracking-tight shiny-text pb-2 mt-4 mb-6">
+              About DeployGuard & How It Works
+            </h2>
+            <p className="text-base text-[#5A635A] leading-relaxed mb-10 max-w-3xl">
+              DeployGuard is a premium, real-time DevSecOps verification gateway built specifically for Salesforce and cloud CI/CD pipelines. It intercepts high-risk vulnerabilities, checks rule compliance, and estimates deployment optimization metrics before code is pushed to production.
+            </p>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="bg-[#FAFBF9] border border-[#F1F3F1] p-6 rounded-2xl">
+                <h4 className="font-semibold text-black mb-3 flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-600"></span>
+                  Why DeployGuard?
+                </h4>
+                <p className="text-sm text-[#738273] leading-relaxed">
+                  Traditional scanners check code only after commits are merged. DeployGuard analyzes the Abstract Syntax Tree (AST) of your YAML pipelines and Apex classes instantly, preventing broken deployments, unsafe Connected App IDs, or credentials leaks from reaching production.
+                </p>
+              </div>
+
+              <div className="bg-[#FAFBF9] border border-[#F1F3F1] p-6 rounded-2xl">
+                <h4 className="font-semibold text-black mb-3 flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-violet-600"></span>
+                  Core Mechanisms
+                </h4>
+                <p className="text-sm text-[#738273] leading-relaxed">
+                  Our system combines static parsing with dynamic background validation. Leveraging BullMQ job queues, Redis caches, and simulated live WebSocket streams, the dashboard provides interactive logs and security reports directly to your browser with click-to-fix AI recommendations.
+                </p>
+              </div>
+            </div>
+          </motion.section>
+
+          {/* Contact Section */}
+          <motion.section 
+            id="contact"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            className="w-full max-w-4xl py-24 md:py-32 border-t border-[#F1F3F1] my-8"
+          >
+            <div className="bg-[#1C2E1E] text-white p-8 md:p-12 rounded-3xl relative overflow-hidden group shadow-lg">
+              <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl group-hover:bg-emerald-500/20 transition-all duration-700 pointer-events-none"></div>
+              
+              <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
+                <div>
+                  <span className="px-3 py-1 bg-white/10 text-white/95 text-[10px] font-bold uppercase tracking-widest rounded-full mb-4 inline-block">Need Help?</span>
+                  <h3 className="text-2xl md:text-3xl font-normal tracking-tight mb-2">Have questions or found an issue?</h3>
+                  <p className="text-sm text-neutral-300 max-w-md">
+                    If you run into any issues with the pipeline validator or payment gateway, connect with me directly on LinkedIn. I am happy to help you get it resolved.
+                  </p>
+                </div>
+                
+                <a 
+                  href="https://www.linkedin.com/in/tannu005" 
+                  target="_blank" 
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-white text-black font-semibold rounded-full hover:bg-neutral-100 transition-all transform active:scale-95 shadow-md flex-shrink-0"
+                >
+                  Connect on LinkedIn <ArrowRight className="w-4 h-4" />
+                </a>
+              </div>
+            </div>
+          </motion.section>
 
         </main>
       </div>
