@@ -166,4 +166,14 @@ router.post('/analyze', async (req: Request, res: Response) => {
   }
 });
 
+router.get('/debug-db', (req: Request, res: Response) => {
+  const dbUrl = process.env.DATABASE_URL || '';
+  return res.json({
+    hasDbUrl: !!dbUrl,
+    length: dbUrl.length,
+    prefix: dbUrl ? dbUrl.split(':')[0] + '://' : 'none',
+    startsWithPostgres: dbUrl.startsWith('postgresql://') || dbUrl.startsWith('postgres://')
+  });
+});
+
 export default router;
