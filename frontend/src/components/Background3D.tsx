@@ -3,10 +3,11 @@
 import { useRef, useState } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Points, PointMaterial } from '@react-three/drei';
+// @ts-ignore
 import * as random from 'maath/random/dist/maath-random.esm';
 
 function Starfield(props: any) {
-  const ref = useRef<any>();
+  const ref = useRef<any>(null);
   // Generate 5000 points in a sphere
   const [sphere] = useState(() => random.inSphere(new Float32Array(5000), { radius: 1.5 }) as Float32Array);
 

@@ -61,7 +61,7 @@ router.post('/create-checkout-session', async (req: Request, res: Response) => {
     const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
 
     // Build checkout session config
-    const sessionConfig: Stripe.Checkout.SessionCreateParams = {
+    const sessionConfig: any = {
       mode: 'subscription',
       payment_method_types: ['card'],
       customer_email: email,
@@ -103,14 +103,14 @@ router.post('/webhook', async (req: Request, res: Response) => {
   const sig = req.headers['stripe-signature'] as string;
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
-  let event: Stripe.Event;
+  let event: any;
 
   try {
     if (webhookSecret && sig) {
       event = stripe.webhooks.constructEvent(req.body, sig, webhookSecret);
     } else {
       // In dev without webhook secret, parse the event directly
-      event = req.body as Stripe.Event;
+      event = req.body;
     }
   } catch (err: any) {
     console.error('Webhook signature verification failed:', err.message);
@@ -120,7 +120,7 @@ router.post('/webhook', async (req: Request, res: Response) => {
   try {
     switch (event.type) {
       case 'checkout.session.completed': {
-        const session = event.data.object as Stripe.Checkout.Session;
+        const session = event.data.object as any;
         const email = session.customer_email || session.metadata?.email || '';
         const plan = session.metadata?.plan || 'PRO';
         const customerId = session.customer as string;

@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { motion, AnimatePresence, useScroll, useMotionValueEvent } from 'framer-motion';
-import { Check, Activity, ArrowRight, GitBranch, Code, PlayCircle, ShieldCheck, Sparkles, Shield } from 'lucide-react';
+import { Check, Activity, ArrowRight, GitBranch, Code, PlayCircle, ShieldCheck, Sparkles, Shield, CloudLightning } from 'lucide-react';
 import Link from 'next/link';
 import { ValidationReport, PipelineReport } from '@/components/ValidationReport';
 import { LiveLogViewer } from '@/components/LiveLogViewer';

@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShieldAlert, Zap, DollarSign, CloudLightning, Shield } from 'lucide-react';
+import { ShieldAlert, Zap, DollarSign, CloudLightning, Shield, ShieldCheck } from 'lucide-react';
 
 export interface PipelineIssue {
   ruleId: string;
