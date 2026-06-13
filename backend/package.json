@@ -15,6 +15,10 @@
   "type": "commonjs",
   "dependencies": {
     "@prisma/client": "^5.22.0",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/node": "^25.9.3",
+    "@types/ws": "^8.18.1",
     "axios": "^1.17.0",
     "bullmq": "^5.78.0",
     "cors": "^2.8.6",
@@ -23,23 +27,19 @@
     "ioredis": "^5.11.1",
     "ioredis-mock": "^8.13.1",
     "pg": "^8.21.0",
+    "prisma": "^5.22.0",
     "stripe": "^22.2.1",
+    "typescript": "^6.0.3",
     "ws": "^8.21.0",
     "yaml": "^2.9.0"
   },
   "devDependencies": {
     "@emnapi/core": "1.11.1",
     "@emnapi/runtime": "1.11.1",
-    "@types/cors": "^2.8.19",
-    "@types/express": "^5.0.6",
     "@types/jest": "^30.0.0",
-    "@types/node": "^25.9.3",
-    "@types/ws": "^8.18.1",
     "jest": "^30.4.2",
     "nodemon": "^3.1.14",
-    "prisma": "^5.22.0",
     "ts-jest": "^29.4.11",
-    "ts-node": "^10.9.2",
-    "typescript": "^6.0.3"
+    "ts-node": "^10.9.2"
   }
 }
