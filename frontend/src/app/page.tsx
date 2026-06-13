@@ -163,22 +163,113 @@ export default function Home() {
 
   const handleFixIssue = (issue: any) => {
     let currentYaml = yamlInput;
-    if (issue.ruleId === 'SEC-001' || issue.description.includes('AWS_SECRET_ACCESS_KEY')) {
-      currentYaml = currentYaml.replace(/aws_secret_access_key:\s*["']?[A-Za-z0-9/+=]{40}["']?/g, 'aws_secret_access_key: "${{ secrets.AWS_SECRET_ACCESS_KEY }}"');
-      currentYaml = currentYaml.replace(/aws_access_key_id:\s*["']?[A-Z0-9]{20}["']?/g, 'aws_access_key_id: "${{ secrets.AWS_ACCESS_KEY_ID }}"');
-    }
-    else if (issue.ruleId === 'SEC-002' || issue.description.includes('password')) {
-      currentYaml = currentYaml.replace(/password:\s*["']?[A-Za-z0-9_@#$-]+["']?/g, 'password: "${{ secrets.SF_PASSWORD }}"');
-      currentYaml = currentYaml.replace(/client_secret:\s*["']?[A-Za-z0-9_@#$-]+["']?/g, 'client_secret: "${{ secrets.SF_CLIENT_SECRET }}"');
-    }
-    else if (issue.ruleId === 'SF-001' || issue.description.includes('destructiveChanges')) {
-      currentYaml = currentYaml.replace(/destructiveChangesPost\.xml/g, '# destructiveChangesPost.xml (removed for safety)');
-      currentYaml = currentYaml.replace(/destructiveChangesPre\.xml/g, '# destructiveChangesPre.xml (removed for safety)');
-    }
-    else if (issue.ruleId.startsWith('CUSTOM-') || issue.ruleId === 'CUSTOM-COMPLIANCE') {
-      if (issue.description.includes('found pattern "')) {
-        const pattern = issue.description.split('found pattern "')[1].split('"')[0];
-        currentYaml = currentYaml.replaceAll(pattern, `# REMOVED COMPLIANCE VIOLATION: ${pattern}`);
+    const ruleId = issue.ruleId || issue.type;
+    const desc = issue.description || issue.message || '';
+    const lineNum = issue.line;
+
+    if (lineNum && typeof lineNum === 'number') {
+      const lines = currentYaml.split('\n');
+      const lineIndex = lineNum - 1;
+      if (lineIndex >= 0 && lineIndex < lines.length) {
+        const line = lines[lineIndex];
+        
+        if (ruleId === 'SEC-001' || ruleId === 'SEC-002') {
+          const delimiterIndex = line.indexOf(':') !== -1 ? line.indexOf(':') : line.indexOf('=');
+          if (delimiterIndex !== -1) {
+            const key = line.substring(0, delimiterIndex);
+            const cleanKey = key.trim().replace(/['"-\s]/g, '_').toUpperCase();
+            const indentation = line.match(/^\s*/)?.[0] || '';
+            const delimiter = line.charAt(delimiterIndex);
+            lines[lineIndex] = `${indentation}${key.trim()}${delimiter} "\${{ secrets.${cleanKey} }}"`;
+          } else {
+            const indentation = line.match(/^\s*/)?.[0] || '';
+            lines[lineIndex] = `${indentation}# REMOVED SECRET: ${line.trim()}`;
+          }
+        }
+        else if (ruleId === 'SF-002') {
+          const trimmed = line.trim();
+          lines[lineIndex] = line.replace(trimmed, `${trimmed} --test-level RunLocalTests`);
+        }
+        else if (ruleId === 'SF-003') {
+          lines[lineIndex] = line.replace(/--clientid\s+[A-Za-z0-9_]+/gi, '--clientid "${{ secrets.SF_CLIENT_ID }}"');
+        }
+        else if (ruleId === 'SF-001') {
+          lines[lineIndex] = line.replace(/destructiveChangesPost\.xml/gi, '# destructiveChangesPost.xml (removed for safety)')
+                                 .replace(/destructiveChangesPre\.xml/gi, '# destructiveChangesPre.xml (removed for safety)');
+        }
+        else if (ruleId === 'COST-001') {
+          lines[lineIndex] = line.replace(/macos-latest/gi, 'ubuntu-latest');
+        }
+        else if (ruleId === 'COST-002') {
+          lines[lineIndex] = line + '\n    timeout-minutes: 15';
+        }
+        else if (ruleId === 'PERF-002') {
+          if (line.includes('setup-node')) {
+            lines[lineIndex] = line + '\n        with:\n          cache: \'npm\'';
+          }
+        }
+        else if (ruleId.startsWith('CUSTOM') || ruleId === 'CUSTOM-COMPLIANCE') {
+          const matchingRule = customRules.find(r => r.ruleId === ruleId);
+          const pattern = matchingRule?.pattern;
+          if (pattern) {
+            lines[lineIndex] = line.replaceAll(pattern, `# REMOVED COMPLIANCE VIOLATION: ${pattern}`);
+          } else if (desc.includes('found pattern "')) {
+            const parsedPattern = desc.split('found pattern "')[1].split('"')[0];
+            lines[lineIndex] = line.replaceAll(parsedPattern, `# REMOVED COMPLIANCE VIOLATION: ${parsedPattern}`);
+          } else {
+            const indentation = line.match(/^\s*/)?.[0] || '';
+            lines[lineIndex] = `${indentation}# REMOVED COMPLIANCE VIOLATION: ${line.trim()}`;
+          }
+        }
+        
+        currentYaml = lines.join('\n');
+      }
+    } else {
+      if (ruleId === 'SEC-001' || desc.includes('AWS_SECRET_ACCESS_KEY')) {
+        currentYaml = currentYaml.replace(/aws_secret_access_key:\s*["']?[A-Za-z0-9/+=]{40}["']?/gi, 'aws_secret_access_key: "${{ secrets.AWS_SECRET_ACCESS_KEY }}"');
+        currentYaml = currentYaml.replace(/aws_access_key_id:\s*["']?[A-Z0-9]{20}["']?/gi, 'aws_access_key_id: "${{ secrets.AWS_ACCESS_KEY_ID }}"');
+      }
+      else if (ruleId === 'SEC-002' || desc.includes('password') || desc.includes('token') || desc.includes('secret')) {
+        currentYaml = currentYaml.replace(/password:\s*["']?[A-Za-z0-9_@#$-]+["']?/gi, 'password: "${{ secrets.SF_PASSWORD }}"');
+        currentYaml = currentYaml.replace(/client_secret:\s*["']?[A-Za-z0-9_@#$-]+["']?/gi, 'client_secret: "${{ secrets.SF_CLIENT_SECRET }}"');
+        currentYaml = currentYaml.replace(/token:\s*["']?[A-Za-z0-9_@#$-]{10,}["']?/gi, 'token: "${{ secrets.SF_TOKEN }}"');
+        currentYaml = currentYaml.replace(/api_key:\s*["']?[A-Za-z0-9_@#$-]+["']?/gi, 'api_key: "${{ secrets.API_KEY }}"');
+        currentYaml = currentYaml.replace(/apikey:\s*["']?[A-Za-z0-9_@#$-]+["']?/gi, 'apikey: "${{ secrets.API_KEY }}"');
+      }
+      else if (ruleId === 'SF-001' || desc.includes('destructiveChanges')) {
+        currentYaml = currentYaml.replace(/destructiveChangesPost\.xml/gi, '# destructiveChangesPost.xml (removed for safety)');
+        currentYaml = currentYaml.replace(/destructiveChangesPre\.xml/gi, '# destructiveChangesPre.xml (removed for safety)');
+      }
+      else if (ruleId === 'SF-003' || desc.includes('Connected App Client ID') || desc.includes('--clientid')) {
+        currentYaml = currentYaml.replace(/--clientid\s+[A-Za-z0-9_]+/gi, '--clientid "${{ secrets.SF_CLIENT_ID }}"');
+      }
+      else if (ruleId === 'SF-002' || desc.includes('test level') || desc.includes('--test-level')) {
+        currentYaml = currentYaml.split('\n').map(line => {
+          if ((line.includes('force:source:deploy') || line.includes('project deploy start')) && 
+              !line.includes('-l') && !line.includes('--test-level')) {
+            return line + ' --test-level RunLocalTests';
+          }
+          return line;
+        }).join('\n');
+      }
+      else if (ruleId === 'COST-001') {
+        currentYaml = currentYaml.replace(/runs-on:\s*macos-latest/gi, 'runs-on: ubuntu-latest');
+      }
+      else if (ruleId === 'COST-002') {
+        currentYaml = currentYaml.replace(/runs-on:\s*([^\n]+)/i, 'runs-on: $1\n    timeout-minutes: 15');
+      }
+      else if (ruleId === 'PERF-002') {
+        currentYaml = currentYaml.replace(/(uses:\s*actions\/setup-node@[^\n]+)/g, '$1\n        with:\n          cache: \'npm\'');
+      }
+      else if (ruleId.startsWith('CUSTOM') || ruleId === 'CUSTOM-COMPLIANCE') {
+        const matchingRule = customRules.find(r => r.ruleId === ruleId);
+        const pattern = matchingRule?.pattern;
+        if (pattern) {
+          currentYaml = currentYaml.replaceAll(pattern, `# REMOVED COMPLIANCE VIOLATION: ${pattern}`);
+        } else if (desc.includes('found pattern "')) {
+          const parsedPattern = desc.split('found pattern "')[1].split('"')[0];
+          currentYaml = currentYaml.replaceAll(parsedPattern, `# REMOVED COMPLIANCE VIOLATION: ${parsedPattern}`);
+        }
       }
     }
     setYamlInput(currentYaml);
@@ -761,115 +852,166 @@ export default function Home() {
           </motion.section>
 
           {/* Premium custom PR Bot modal */}
+          {/* Premium custom PR Bot modal */}
           <AnimatePresence>
-            {showPrModal && (
-              <motion.div 
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md"
-                onClick={() => setShowPrModal(false)}
-              >
-                <motion.div 
-                  initial={{ scale: 0.95, y: 20 }}
-                  animate={{ scale: 1, y: 0 }}
-                  exit={{ scale: 0.95, y: 20 }}
-                  transition={{ type: "spring", duration: 0.5 }}
-                  className="bg-white border border-[#EAECE9] rounded-3xl p-8 max-w-2xl w-full shadow-[0_24px_60px_rgba(0,0,0,0.15)] relative overflow-hidden text-left"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  {/* Top accent line */}
-                  <div className="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-red-500 via-amber-500 to-emerald-500" />
+            {showPrModal && (() => {
+              const hasCritical = report ? report.criticalIssues > 0 : false;
+              const hasAny = report ? report.totalIssues > 0 : false;
+              const statusText = hasCritical ? 'FAILED' : (hasAny ? 'WARNING' : 'PASSED');
+              
+              const statusBg = statusText === 'FAILED' 
+                ? 'bg-red-50 border-red-200 text-red-700' 
+                : (statusText === 'WARNING' 
+                  ? 'bg-amber-50 border-amber-200 text-amber-700' 
+                  : 'bg-emerald-50 border-emerald-200 text-emerald-700');
                   
-                  {/* Modal Header */}
-                  <div className="flex items-start justify-between mb-6">
-                    <div className="flex items-center gap-3">
-                      <div className="p-3 bg-violet-100 text-violet-700 rounded-2xl">
-                        <GitBranch className="w-6 h-6" />
-                      </div>
-                      <div>
-                        <h3 className="text-xl font-bold text-black flex items-center gap-2">
-                          DeployGuard PR Bot
-                        </h3>
-                        <p className="text-xs text-[#738273]">Simulated Webhook Event Outcome</p>
-                      </div>
-                    </div>
-                    <button 
-                      onClick={() => setShowPrModal(false)}
-                      className="text-[#738273] hover:text-black font-bold text-xl p-2 transition-colors"
-                    >
-                      &times;
-                    </button>
-                  </div>
+              const statusIndicator = statusText === 'FAILED' 
+                ? 'bg-red-500' 
+                : (statusText === 'WARNING' 
+                  ? 'bg-amber-500' 
+                  : 'bg-emerald-500');
+                  
+              const firstIssue = report && report.issues.length > 0 ? report.issues[0] : null;
+              const repoDisplay = githubRepo ? githubRepo.replace(/https?:\/\/(www\.)?github\.com\//, '') : 'enterprise-project/sf-pipeline';
 
-                  {/* Modal Body */}
-                  <div className="space-y-6">
+              return (
+                <motion.div 
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md"
+                  onClick={() => setShowPrModal(false)}
+                >
+                  <motion.div 
+                    initial={{ scale: 0.95, y: 20 }}
+                    animate={{ scale: 1, y: 0 }}
+                    exit={{ scale: 0.95, y: 20 }}
+                    transition={{ type: "spring", duration: 0.5 }}
+                    className="bg-white border border-[#EAECE9] rounded-3xl p-8 max-w-2xl w-full shadow-[0_24px_60px_rgba(0,0,0,0.15)] relative overflow-hidden text-left"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {/* Top accent line */}
+                    <div className={`absolute top-0 inset-x-0 h-1.5 ${statusText === 'FAILED' ? 'bg-red-500' : (statusText === 'WARNING' ? 'bg-amber-500' : 'bg-emerald-500')}`} />
                     
-                    {/* PR Details Box */}
-                    <div className="bg-[#FAFBF9] border border-[#F1F3F1] p-5 rounded-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                      <div>
-                        <p className="text-[11px] uppercase tracking-wider text-[#5A635A] font-bold mb-1">GitHub Repository & Pull Request</p>
-                        <p className="text-sm font-semibold text-black flex items-center gap-2">
-                          <span className="font-mono bg-white border border-[#EAECE9] px-2 py-0.5 rounded text-xs text-[#1C2E1E]">PR #482</span>
-                          <span className="text-neutral-500">on</span>
-                          <span className="font-mono text-xs">feature/deploy-prod</span>
-                        </p>
-                      </div>
-                      <div className="px-3 py-1.5 bg-red-50 border border-red-200 text-red-700 text-xs font-bold uppercase tracking-wider rounded-lg flex items-center gap-1.5">
-                        <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
-                        CI/CD Status: FAILED
-                      </div>
-                    </div>
-
-                    {/* Findings Timeline */}
-                    <div className="space-y-3">
-                      <h4 className="text-xs font-bold uppercase tracking-wider text-[#5A635A]">Execution Summary</h4>
-                      <div className="space-y-2.5 font-sans text-sm text-neutral-700">
-                        <div className="flex items-center gap-3">
-                          <div className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center text-[10px] font-bold">1</div>
-                          <p>Scanned Pull Request <strong className="text-black">#482</strong> ("feature/deploy-prod") successfully.</p>
+                    {/* Modal Header */}
+                    <div className="flex items-start justify-between mb-6">
+                      <div className="flex items-center gap-3">
+                        <div className="p-3 bg-violet-100 text-violet-700 rounded-2xl">
+                          <GitBranch className="w-6 h-6" />
                         </div>
-                        <div className="flex items-center gap-3">
-                          <div className="w-5 h-5 rounded-full bg-red-100 text-red-800 flex items-center justify-center text-[10px] font-bold">2</div>
-                          <p>Found <strong className="text-red-600">1 critical risk</strong>: Hardcoded Salesforce Session Token.</p>
+                        <div>
+                          <h3 className="text-xl font-bold text-black flex items-center gap-2">
+                            DeployGuard PR Bot
+                          </h3>
+                          <p className="text-xs text-[#738273]">Simulated Webhook Event Outcome</p>
                         </div>
                       </div>
+                      <button 
+                        onClick={() => setShowPrModal(false)}
+                        className="text-[#738273] hover:text-black font-bold text-xl p-2 transition-colors"
+                      >
+                        &times;
+                      </button>
                     </div>
 
-                    {/* Review Comment Mock */}
-                    <div className="border border-[#EAECE9] rounded-2xl overflow-hidden shadow-sm">
-                      <div className="bg-[#FAFBF9] border-b border-[#EAECE9] px-4 py-2 flex items-center justify-between text-xs text-[#5A635A]">
-                        <div className="flex items-center gap-2">
-                          <div className="w-5 h-5 rounded-full bg-[#1C2E1E] text-white flex items-center justify-center font-bold text-[9px]">DG</div>
-                          <span><strong>deployguard-bot</strong> commented on Line 14</span>
+                    {/* Modal Body */}
+                    <div className="space-y-6">
+                      
+                      {/* PR Details Box */}
+                      <div className="bg-[#FAFBF9] border border-[#F1F3F1] p-5 rounded-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                        <div>
+                          <p className="text-[11px] uppercase tracking-wider text-[#5A635A] font-bold mb-1">GitHub Repository & Pull Request</p>
+                          <p className="text-sm font-semibold text-black flex items-center gap-2 flex-wrap">
+                            <span className="font-mono bg-white border border-[#EAECE9] px-2 py-0.5 rounded text-xs text-[#1C2E1E]">PR #482</span>
+                            <span className="text-neutral-500">on</span>
+                            <span className="font-mono text-xs max-w-[200px] truncate" title={repoDisplay}>{repoDisplay}</span>
+                          </p>
                         </div>
-                        <span className="bg-neutral-100 px-1.5 py-0.5 rounded text-[10px] uppercase font-bold text-neutral-600">Reviewer</span>
+                        <div className={`px-3 py-1.5 border ${statusBg} text-xs font-bold uppercase tracking-wider rounded-lg flex items-center gap-1.5`}>
+                          <span className={`w-2 h-2 rounded-full ${statusIndicator} ${statusText !== 'PASSED' ? 'animate-pulse' : ''}`}></span>
+                          CI/CD Status: {statusText}
+                        </div>
                       </div>
-                      <div className="p-4 bg-white font-mono text-xs text-neutral-800 border-l-4 border-red-500">
-                        <p className="font-semibold text-red-600 mb-1">❌ SEC-002: Hardcoded token detected on Line 14.</p>
-                        <p className="text-neutral-500">Recommend using <code className="bg-red-50 px-1 py-0.5 rounded border border-red-100 text-red-700 font-bold">${`{ secrets.SF_SESSION_ID }`}</code> instead.</p>
+
+                      {/* Findings Timeline */}
+                      <div className="space-y-3">
+                        <h4 className="text-xs font-bold uppercase tracking-wider text-[#5A635A]">Execution Summary</h4>
+                        <div className="space-y-2.5 font-sans text-sm text-neutral-700">
+                          <div className="flex items-center gap-3">
+                            <div className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center text-[10px] font-bold">1</div>
+                            <p>Scanned Pull Request <strong className="text-black">#482</strong> successfully.</p>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold ${statusText === 'FAILED' ? 'bg-red-100 text-red-800' : (statusText === 'WARNING' ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800')}`}>2</div>
+                            <p>
+                              {hasAny ? (
+                                <>
+                                  Found <strong className={statusText === 'FAILED' ? 'text-red-600' : 'text-amber-600'}>{report?.totalIssues} risk{report?.totalIssues !== 1 ? 'es' : ''}</strong> ({report?.criticalIssues} critical) in the repository workflow.
+                                </>
+                              ) : (
+                                <>Found <strong className="text-emerald-700">0 critical risks</strong>. All compliance checks passed.</>
+                              )}
+                            </p>
+                          </div>
+                        </div>
                       </div>
+
+                      {/* Review Comment Mock */}
+                      <div className="border border-[#EAECE9] rounded-2xl overflow-hidden shadow-sm">
+                        <div className="bg-[#FAFBF9] border-b border-[#EAECE9] px-4 py-2 flex items-center justify-between text-xs text-[#5A635A]">
+                          <div className="flex items-center gap-2">
+                            <div className="w-5 h-5 rounded-full bg-[#1C2E1E] text-white flex items-center justify-center font-bold text-[9px]">DG</div>
+                            <span>
+                              <strong>deployguard-bot</strong> {firstIssue ? `commented on Line ${firstIssue.line || 1}` : 'approved this pull request'}
+                            </span>
+                          </div>
+                          <span className="bg-neutral-100 px-1.5 py-0.5 rounded text-[10px] uppercase font-bold text-neutral-600">Reviewer</span>
+                        </div>
+                        {firstIssue ? (
+                          <div className={`p-4 bg-white font-mono text-xs text-neutral-800 border-l-4 ${firstIssue.severity === 'CRITICAL' ? 'border-red-500' : (firstIssue.severity === 'HIGH' ? 'border-orange-500' : 'border-amber-500')}`}>
+                            <p className={`font-semibold mb-1 ${firstIssue.severity === 'CRITICAL' ? 'text-red-600' : (firstIssue.severity === 'HIGH' ? 'text-orange-600' : 'text-amber-600')}`}>
+                              ❌ {firstIssue.ruleId}: {firstIssue.description}
+                            </p>
+                            <p className="text-neutral-500">Recommend: <code className="bg-neutral-50 px-1 py-0.5 rounded border border-neutral-100 text-neutral-700 font-semibold">{firstIssue.suggestion}</code></p>
+                          </div>
+                        ) : (
+                          <div className="p-4 bg-white font-mono text-xs text-neutral-800 border-l-4 border-emerald-500">
+                            <p className="font-semibold text-emerald-600 mb-1">
+                              ✅ DeployGuard Validation Passed: No security or compliance issues detected in your workflow configuration.
+                            </p>
+                            <p className="text-neutral-500">All rules satisfied. Ready for deployment.</p>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Action Footer */}
+                      <div className={`p-4 border rounded-2xl text-xs leading-relaxed ${statusText === 'FAILED' ? 'bg-red-50/50 border-red-100/70 text-red-800' : (statusText === 'WARNING' ? 'bg-amber-50/50 border-amber-100/70 text-amber-800' : 'bg-emerald-50/50 border-emerald-100/70 text-emerald-800')}`}>
+                        {statusText === 'FAILED' ? (
+                          <>
+                            <strong>Blocker active:</strong> The GitHub workflow run was terminated and marked as failed. Merging has been blocked until all validation issues are remediated.
+                          </>
+                        ) : (
+                          <>
+                            <strong>Workflow clean:</strong> All checks passed successfully. Merging is allowed and integration verification is complete.
+                          </>
+                        )}
+                      </div>
+
                     </div>
 
-                    {/* Action Footer */}
-                    <div className="p-4 bg-red-50/50 border border-red-100/70 rounded-2xl text-xs text-red-800 leading-relaxed">
-                      <strong>Blocker active:</strong> The GitHub workflow run was terminated and marked as failed. Merging has been blocked until this validation issue is remediated.
+                    {/* Modal Footer */}
+                    <div className="mt-8 pt-6 border-t border-[#EAECE9] flex justify-end">
+                      <button
+                        onClick={() => setShowPrModal(false)}
+                        className="px-6 py-2.5 bg-[#1C2E1E] hover:bg-black text-white font-semibold rounded-full shadow transition-all active:scale-95 text-xs"
+                      >
+                        Acknowledge & Close
+                      </button>
                     </div>
-
-                  </div>
-
-                  {/* Modal Footer */}
-                  <div className="mt-8 pt-6 border-t border-[#EAECE9] flex justify-end">
-                    <button
-                      onClick={() => setShowPrModal(false)}
-                      className="px-6 py-2.5 bg-[#1C2E1E] hover:bg-black text-white font-semibold rounded-full shadow transition-all active:scale-95 text-xs"
-                    >
-                      Acknowledge & Close
-                    </button>
-                  </div>
+                  </motion.div>
                 </motion.div>
-              </motion.div>
-            )}
+              );
+            })()}
           </AnimatePresence>
 
         </main>
