@@ -18,9 +18,12 @@ export class SalesforceValidator {
           if (!commandStr.includes('-l') && !commandStr.includes('--test-level') && !commandStr.includes('runlocaltests') && !commandStr.includes('runspecifiedtests')) {
             issues.push({
               type: 'SALESFORCE_MISSING_TEST_LEVEL',
+              ruleId: 'SF-002',
               severity: 'HIGH',
               message: 'Salesforce deployment detected without a specified test level. Always use `-l RunLocalTests` or `-l RunSpecifiedTests` to prevent production code coverage failures.',
+              description: 'Salesforce deployment detected without a specified test level. Always use `-l RunLocalTests` or `-l RunSpecifiedTests` to prevent production code coverage failures.',
               fix: 'Add `--test-level RunLocalTests` to your deployment command.',
+              suggestion: 'Add `--test-level RunLocalTests` to your deployment command.',
               line: step.line
             });
           }
@@ -34,9 +37,12 @@ export class SalesforceValidator {
              if (parts.length > 1 && parts[1].trim().length > 15) {
                issues.push({
                 type: 'SALESFORCE_HARDCODED_CLIENT_ID',
+                ruleId: 'SF-003',
                 severity: 'CRITICAL',
                 message: 'Hardcoded Salesforce Connected App Client ID detected in authentication command.',
+                description: 'Hardcoded Salesforce Connected App Client ID detected in authentication command.',
                 fix: 'Store the Client ID in a secure environment variable (e.g., secrets.SF_CLIENT_ID) and reference it dynamically.',
+                suggestion: 'Store the Client ID in a secure environment variable (e.g., secrets.SF_CLIENT_ID) and reference it dynamically.',
                 line: step.line
               });
              }
@@ -47,9 +53,12 @@ export class SalesforceValidator {
         if (commandStr.includes('destructivechanges') || commandStr.includes('--ignorewarnings')) {
             issues.push({
               type: 'SALESFORCE_DESTRUCTIVE_CHANGES',
+              ruleId: 'SF-001',
               severity: 'MEDIUM',
               message: 'Destructive changes or ignored warnings detected in Salesforce deployment.',
+              description: 'Destructive changes or ignored warnings detected in Salesforce deployment.',
               fix: 'Ensure destructive deployments are restricted to specific branches or require manual approval in the CI/CD pipeline.',
+              suggestion: 'Ensure destructive deployments are restricted to specific branches or require manual approval in the CI/CD pipeline.',
               line: step.line
             });
         }

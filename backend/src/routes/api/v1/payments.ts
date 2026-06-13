@@ -48,7 +48,7 @@ async function getOrCreatePrice(plan: string): Promise<string> {
 // POST /create-checkout-session
 router.post('/create-checkout-session', async (req: Request, res: Response) => {
   try {
-    const { email, plan, promoCode } = req.body;
+    let { email, plan, promoCode } = req.body;
 
     if (!email || !plan) {
       return res.status(400).json({ error: 'Email and plan are required.' });
@@ -58,6 +58,7 @@ router.post('/create-checkout-session', async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Invalid plan. Choose PRO or ENTERPRISE.' });
     }
 
+    if (email) email = email.trim().toLowerCase();
     const priceId = await getOrCreatePrice(plan);
     const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
 
@@ -122,7 +123,8 @@ router.post('/webhook', async (req: Request, res: Response) => {
     switch (event.type) {
       case 'checkout.session.completed': {
         const session = event.data.object as any;
-        const email = session.customer_email || session.metadata?.email || '';
+        let email = session.customer_email || session.metadata?.email || '';
+        email = email.trim().toLowerCase();
         const plan = session.metadata?.plan || 'PRO';
         const customerId = session.customer as string;
         const subscriptionId = session.subscription as string;
@@ -199,7 +201,7 @@ router.post('/webhook', async (req: Request, res: Response) => {
 // GET /subscription/:email — Check subscription status
 router.get('/subscription/:email', async (req: Request, res: Response) => {
   try {
-    const email = req.params.email as string;
+    const email = (req.params.email as string).trim().toLowerCase();
     const subscription = await prisma.subscription.findUnique({
       where: { email },
     });
@@ -280,7 +282,8 @@ router.post('/create-promo', async (req: Request, res: Response) => {
 // POST /verify-session — Verify Stripe checkout session (fallback for localhost testing without webhooks)
 router.post('/verify-session', async (req: Request, res: Response) => {
   try {
-    const { sessionId, email } = req.body;
+    let { sessionId, email } = req.body;
+    if (email) email = email.trim().toLowerCase();
 
     if (!sessionId || !email) {
       return res.status(400).json({ error: 'sessionId and email are required.' });
@@ -332,49 +335,5 @@ router.post('/verify-session', async (req: Request, res: Response) => {
   }
 });
 
-// POST /grant-dev-license — Grant free developer Enterprise subscription
-router.post('/grant-dev-license', async (req: Request, res: Response) => {
-  try {
-    const { email } = req.body;
-    if (!email) {
-      return res.status(400).json({ error: 'Email is required.' });
-    }
-
-    if (email.trim().toLowerCase() !== 'ytannu1410@gmail.com') {
-      return res.status(403).json({ error: 'Access Denied: Only the authorized developer email (ytannu1410@gmail.com) can bypass payments.' });
-    }
-
-    const tenYearsFromNow = new Date();
-    tenYearsFromNow.setFullYear(tenYearsFromNow.getFullYear() + 10);
-
-    const subscription = await prisma.subscription.upsert({
-      where: { email },
-      update: {
-        plan: 'ENTERPRISE',
-        status: 'ACTIVE',
-        currentPeriodEnd: tenYearsFromNow,
-        stripeCustomerId: 'DEV_BYPASS',
-        stripeSubscriptionId: 'DEV_BYPASS_SUB',
-      },
-      create: {
-        email,
-        plan: 'ENTERPRISE',
-        status: 'ACTIVE',
-        currentPeriodEnd: tenYearsFromNow,
-        stripeCustomerId: 'DEV_BYPASS',
-        stripeSubscriptionId: 'DEV_BYPASS_SUB',
-      },
-    });
-
-    return res.status(200).json({
-      success: true,
-      message: 'Developer Enterprise license granted successfully.',
-      subscription,
-    });
-  } catch (error: any) {
-    console.error('Failed to grant dev license:', error);
-    return res.status(500).json({ error: error.message || 'Failed to grant dev license.' });
-  }
-});
 
 export default router;

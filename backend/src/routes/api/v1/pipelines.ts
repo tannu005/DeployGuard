@@ -23,6 +23,8 @@ router.post('/analyze', async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Please enter your email in the "Check Active Subscriptions" box on the Pricing page to claim your 5 free scans.' });
     }
 
+    email = email.trim().toLowerCase();
+
     // Lookup plan
     let userPlan = 'FREE';
     const subscription = await prisma.subscription.findUnique({
@@ -134,9 +136,12 @@ router.post('/analyze', async (req: Request, res: Response) => {
           customRules.forEach((rule: any) => {
             if (rule.pattern && yaml.includes(rule.pattern)) {
               customIssues.push({
+                type: rule.ruleId || 'CUSTOM-COMPLIANCE',
                 ruleId: rule.ruleId || 'CUSTOM-COMPLIANCE',
                 severity: rule.severity || 'HIGH',
+                message: rule.description || `Custom rule match: found pattern "${rule.pattern}"`,
                 description: rule.description || `Custom rule match: found pattern "${rule.pattern}"`,
+                fix: rule.suggestion || 'Modify code to satisfy enterprise compliance policies.',
                 suggestion: rule.suggestion || 'Modify code to satisfy enterprise compliance policies.',
                 line: 1
               });

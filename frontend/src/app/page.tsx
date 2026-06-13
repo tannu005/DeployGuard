@@ -143,6 +143,7 @@ export default function Home() {
   const [newRulePattern, setNewRulePattern] = useState('');
   const [newRuleDesc, setNewRuleDesc] = useState('');
   const [newRuleId, setNewRuleId] = useState('CUSTOM-01');
+  const [showPrModal, setShowPrModal] = useState(false);
 
   useEffect(() => {
     const savedEmail = localStorage.getItem('deployguard_billing_email');
@@ -206,7 +207,7 @@ export default function Home() {
         githubRepo: inputType === 'github' ? githubRepo : undefined,
         isPrivate: inputType === 'github' && isPrivateRepo,
         githubToken: inputType === 'github' && isPrivateRepo ? githubToken : undefined,
-        customRules: subscription?.plan === 'ENTERPRISE' ? customRules : undefined,
+        customRules: customRules.length > 0 ? customRules : undefined,
       };
       const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
       const response = await axios.post(`${API_URL}/api/v1/pipelines/analyze`, payload);
@@ -533,10 +534,12 @@ export default function Home() {
             {/* Custom Rules Input (Enterprise Only) */}
             {subscription && subscription.plan === 'ENTERPRISE' && (
               <div className="mt-6 p-6 bg-[#FAFBF9] border border-[#F1F3F1] rounded-2xl text-sm relative z-10 shadow-sm">
-                <h4 className="font-bold text-black mb-1 flex items-center gap-1.5">
-                  <ShieldCheck className="w-4 h-4 text-violet-700" />
-                  Custom Security Rule Builder (Enterprise)
-                </h4>
+                <div className="flex items-center justify-between mb-1.5 flex-wrap gap-2">
+                  <h4 className="font-bold text-black flex items-center gap-1.5">
+                    <ShieldCheck className="w-4 h-4 text-violet-700" />
+                    Custom Security Rule Builder (Enterprise)
+                  </h4>
+                </div>
                 <p className="text-xs text-[#738273] mb-4">Define custom pattern match rules that will be checked in real-time during scans.</p>
                 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
@@ -661,22 +664,19 @@ export default function Home() {
                   viewport={{ once: true }}
                   className="mb-24 p-8 bg-[#FAFBF9] border border-[#F1F3F1] rounded-3xl w-full max-w-4xl relative z-10 shadow-sm"
                 >
-                  <h3 className="text-xl font-bold text-black mb-2 flex items-center gap-2">
-                    <GitBranch className="w-5 h-5 text-violet-700" />
-                    Automated Pull Request Bot Simulator (Enterprise)
-                  </h3>
+                  <div className="flex items-center justify-between mb-2 flex-wrap gap-2">
+                    <h3 className="text-xl font-bold text-black flex items-center gap-2">
+                      <GitBranch className="w-5 h-5 text-violet-700" />
+                      Automated Pull Request Bot Simulator (Enterprise)
+                    </h3>
+                  </div>
                   <p className="text-sm text-[#738273] mb-6">
                     Simulate how DeployGuard runs automatically in your GitHub pipeline and leaves blocking code review comments inside pull requests.
                   </p>
                   
                   <button
                     onClick={() => {
-                      alert(`[DeployGuard PR Bot] Simulated webhook triggered! 
-                      
-1. Scanned Pull Request #482 ("feature/deploy-prod")
-2. Found 1 high-risk vulnerability: Hardcoded Salesforce Session Token.
-3. Left review comment: "❌ SEC-002: Hardcoded token detected on Line 14. Recommend using \${{ secrets.SF_SESSION_ID }} instead."
-4. Set CI/CD status to: FAILED (Blocked from merging)`);
+                      setShowPrModal(true);
                     }}
                     className="px-6 py-3 bg-[#1C2E1E] text-white hover:bg-black rounded-full font-medium text-xs shadow-md transition-all active:scale-95 flex items-center gap-2"
                   >
@@ -759,6 +759,118 @@ export default function Home() {
               </div>
             </div>
           </motion.section>
+
+          {/* Premium custom PR Bot modal */}
+          <AnimatePresence>
+            {showPrModal && (
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md"
+                onClick={() => setShowPrModal(false)}
+              >
+                <motion.div 
+                  initial={{ scale: 0.95, y: 20 }}
+                  animate={{ scale: 1, y: 0 }}
+                  exit={{ scale: 0.95, y: 20 }}
+                  transition={{ type: "spring", duration: 0.5 }}
+                  className="bg-white border border-[#EAECE9] rounded-3xl p-8 max-w-2xl w-full shadow-[0_24px_60px_rgba(0,0,0,0.15)] relative overflow-hidden text-left"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {/* Top accent line */}
+                  <div className="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-red-500 via-amber-500 to-emerald-500" />
+                  
+                  {/* Modal Header */}
+                  <div className="flex items-start justify-between mb-6">
+                    <div className="flex items-center gap-3">
+                      <div className="p-3 bg-violet-100 text-violet-700 rounded-2xl">
+                        <GitBranch className="w-6 h-6" />
+                      </div>
+                      <div>
+                        <h3 className="text-xl font-bold text-black flex items-center gap-2">
+                          DeployGuard PR Bot
+                        </h3>
+                        <p className="text-xs text-[#738273]">Simulated Webhook Event Outcome</p>
+                      </div>
+                    </div>
+                    <button 
+                      onClick={() => setShowPrModal(false)}
+                      className="text-[#738273] hover:text-black font-bold text-xl p-2 transition-colors"
+                    >
+                      &times;
+                    </button>
+                  </div>
+
+                  {/* Modal Body */}
+                  <div className="space-y-6">
+                    
+                    {/* PR Details Box */}
+                    <div className="bg-[#FAFBF9] border border-[#F1F3F1] p-5 rounded-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                      <div>
+                        <p className="text-[11px] uppercase tracking-wider text-[#5A635A] font-bold mb-1">GitHub Repository & Pull Request</p>
+                        <p className="text-sm font-semibold text-black flex items-center gap-2">
+                          <span className="font-mono bg-white border border-[#EAECE9] px-2 py-0.5 rounded text-xs text-[#1C2E1E]">PR #482</span>
+                          <span className="text-neutral-500">on</span>
+                          <span className="font-mono text-xs">feature/deploy-prod</span>
+                        </p>
+                      </div>
+                      <div className="px-3 py-1.5 bg-red-50 border border-red-200 text-red-700 text-xs font-bold uppercase tracking-wider rounded-lg flex items-center gap-1.5">
+                        <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+                        CI/CD Status: FAILED
+                      </div>
+                    </div>
+
+                    {/* Findings Timeline */}
+                    <div className="space-y-3">
+                      <h4 className="text-xs font-bold uppercase tracking-wider text-[#5A635A]">Execution Summary</h4>
+                      <div className="space-y-2.5 font-sans text-sm text-neutral-700">
+                        <div className="flex items-center gap-3">
+                          <div className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center text-[10px] font-bold">1</div>
+                          <p>Scanned Pull Request <strong className="text-black">#482</strong> ("feature/deploy-prod") successfully.</p>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <div className="w-5 h-5 rounded-full bg-red-100 text-red-800 flex items-center justify-center text-[10px] font-bold">2</div>
+                          <p>Found <strong className="text-red-600">1 critical risk</strong>: Hardcoded Salesforce Session Token.</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Review Comment Mock */}
+                    <div className="border border-[#EAECE9] rounded-2xl overflow-hidden shadow-sm">
+                      <div className="bg-[#FAFBF9] border-b border-[#EAECE9] px-4 py-2 flex items-center justify-between text-xs text-[#5A635A]">
+                        <div className="flex items-center gap-2">
+                          <div className="w-5 h-5 rounded-full bg-[#1C2E1E] text-white flex items-center justify-center font-bold text-[9px]">DG</div>
+                          <span><strong>deployguard-bot</strong> commented on Line 14</span>
+                        </div>
+                        <span className="bg-neutral-100 px-1.5 py-0.5 rounded text-[10px] uppercase font-bold text-neutral-600">Reviewer</span>
+                      </div>
+                      <div className="p-4 bg-white font-mono text-xs text-neutral-800 border-l-4 border-red-500">
+                        <p className="font-semibold text-red-600 mb-1">❌ SEC-002: Hardcoded token detected on Line 14.</p>
+                        <p className="text-neutral-500">Recommend using <code className="bg-red-50 px-1 py-0.5 rounded border border-red-100 text-red-700 font-bold">${`{ secrets.SF_SESSION_ID }`}</code> instead.</p>
+                      </div>
+                    </div>
+
+                    {/* Action Footer */}
+                    <div className="p-4 bg-red-50/50 border border-red-100/70 rounded-2xl text-xs text-red-800 leading-relaxed">
+                      <strong>Blocker active:</strong> The GitHub workflow run was terminated and marked as failed. Merging has been blocked until this validation issue is remediated.
+                    </div>
+
+                  </div>
+
+                  {/* Modal Footer */}
+                  <div className="mt-8 pt-6 border-t border-[#EAECE9] flex justify-end">
+                    <button
+                      onClick={() => setShowPrModal(false)}
+                      className="px-6 py-2.5 bg-[#1C2E1E] hover:bg-black text-white font-semibold rounded-full shadow transition-all active:scale-95 text-xs"
+                    >
+                      Acknowledge & Close
+                    </button>
+                  </div>
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
         </main>
       </div>

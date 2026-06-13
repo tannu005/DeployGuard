@@ -7,9 +7,12 @@ export class PerformanceValidator {
     if (pipeline.jobs.length > 1 && !this.canParallelize(pipeline)) {
       issues.push({
         type: 'SEQUENTIAL_JOBS',
+        ruleId: 'PERF-001',
         severity: 'MEDIUM',
         message: `Jobs run sequentially. Parallelizing could save significant execution time.`,
-        fix: 'Use job dependencies to parallelize: `needs: [job1]` where applicable, or remove needs if independent.'
+        description: `Jobs run sequentially. Parallelizing could save significant execution time.`,
+        fix: 'Use job dependencies to parallelize: `needs: [job1]` where applicable, or remove needs if independent.',
+        suggestion: 'Use job dependencies to parallelize: `needs: [job1]` where applicable, or remove needs if independent.'
       });
     }
 
@@ -20,9 +23,12 @@ export class PerformanceValidator {
     if (!hasCache) {
       issues.push({
         type: 'MISSING_CACHE',
+        ruleId: 'PERF-002',
         severity: 'HIGH',
         message: 'No caching strategy detected. Dependency installation will be slow.',
-        fix: 'Add actions/cache or use package manager caching in setup actions.'
+        description: 'No caching strategy detected. Dependency installation will be slow.',
+        fix: 'Add actions/cache or use package manager caching in setup actions.',
+        suggestion: 'Add actions/cache or use package manager caching in setup actions.'
       });
     }
     

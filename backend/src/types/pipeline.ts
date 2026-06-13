@@ -30,25 +30,34 @@ export interface Pipeline {
 
 export interface SecurityIssue {
   type: string;
+  ruleId?: string;
   severity: 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW';
   message: string;
+  description?: string;
   fix: string;
+  suggestion?: string;
   line?: number;
 }
 
 export interface PerformanceIssue {
   type: string;
+  ruleId?: string;
   severity: 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW';
   message: string;
+  description?: string;
   fix: string;
+  suggestion?: string;
   line?: number;
 }
 
 export interface CostIssue {
   type: string;
+  ruleId?: string;
   severity: 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW';
   message: string;
+  description?: string;
   fix: string;
+  suggestion?: string;
   line?: number;
 }
 

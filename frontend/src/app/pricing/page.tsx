@@ -38,9 +38,7 @@ export default function PricingPage() {
   const [createdPromo, setCreatedPromo] = useState<{ code: string; percentOff: number } | null>(null);
   const [promoError, setPromoError] = useState<string | null>(null);
 
-  // Developer License States
-  const [loadingDevLicense, setLoadingDevLicense] = useState(false);
-  const [devLicenseMessage, setDevLicenseMessage] = useState<string | null>(null);
+
 
   // URL Query Parameters (Success / Cancel messages)
   const [statusMessage, setStatusMessage] = useState<{ type: 'success' | 'cancelled'; text: string } | null>(null);
@@ -169,31 +167,7 @@ export default function PricingPage() {
     }
   };
 
-  const handleGrantDevLicense = async () => {
-    if (!email.trim()) {
-      setDevLicenseMessage('Please enter an email in the "Check Active Subscriptions" field above first.');
-      return;
-    }
-    if (email.trim().toLowerCase() !== 'ytannu1410@gmail.com') {
-      setDevLicenseMessage('Access Denied: Only the authorized developer email (ytannu1410@gmail.com) can bypass payments.');
-      return;
-    }
-    setLoadingDevLicense(true);
-    setDevLicenseMessage(null);
-    try {
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-      const response = await axios.post(`${API_URL}/api/v1/payments/grant-dev-license`, {
-        email: email.trim(),
-      });
-      setDevLicenseMessage(response.data.message || 'Enterprise license granted!');
-      await checkSubscription(email);
-    } catch (err: any) {
-      console.error(err);
-      setDevLicenseMessage(err.response?.data?.error || 'Failed to grant license.');
-    } finally {
-      setLoadingDevLicense(false);
-    }
-  };
+
 
   return (
     <div className="min-h-screen bg-white text-neutral-900 font-sans selection:bg-[#EAECE9] selection:text-[#1C2E1E] scroll-smooth">
@@ -588,27 +562,7 @@ export default function PricingPage() {
             </div>
           )}
 
-          {/* Dev License Bypass */}
-          <div className="mt-8 pt-8 border-t border-[#EAECE9]">
-            <h4 className="text-xs font-semibold text-black uppercase tracking-wider mb-1">Developer Bypass</h4>
-            <p className="text-[11px] text-[#738273] mb-4">
-              Directly write an active 10-year **Enterprise** subscription to your local database for the email entered in the status box.
-            </p>
-            <button
-              type="button"
-              onClick={handleGrantDevLicense}
-              disabled={loadingDevLicense || !email.trim()}
-              className="w-full py-2.5 bg-emerald-700 text-white font-medium text-xs hover:bg-emerald-800 rounded-xl disabled:opacity-50 transition-all flex items-center justify-center gap-2"
-            >
-              {loadingDevLicense ? 'Granting...' : `Grant Free Enterprise to: ${email || '(enter email above)'}`}
-            </button>
-            
-            {devLicenseMessage && (
-              <div className="mt-4 p-3 bg-neutral-100 border border-[#EAECE9] text-neutral-800 rounded-xl text-xs font-mono">
-                {devLicenseMessage}
-              </div>
-            )}
-          </div>
+
         </div>
 
       </div>

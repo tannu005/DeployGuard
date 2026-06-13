@@ -19,9 +19,12 @@ export class SecurityValidator {
         if (pattern.test(line) && !line.includes('${{')) {
           issues.push({
             type: 'HARDCODED_SECRET',
+            ruleId: line.toLowerCase().includes('aws') ? 'SEC-001' : 'SEC-002',
             severity: 'CRITICAL',
             message: 'Hardcoded secrets detected in pipeline configuration.',
+            description: 'Hardcoded secrets detected in pipeline configuration.',
             fix: 'Use GitHub Secrets or a vault system (e.g., ${{ secrets.MY_SECRET }}).',
+            suggestion: 'Use GitHub Secrets or a vault system (e.g., ${{ secrets.MY_SECRET }}).',
             line: index + 1
           });
         }

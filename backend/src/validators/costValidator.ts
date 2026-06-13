@@ -8,9 +8,12 @@ export class CostValidator {
     if (usesMacOs) {
       issues.push({
         type: 'EXPENSIVE_RUNNER',
+        ruleId: 'COST-001',
         severity: 'MEDIUM',
         message: 'macOS runners are significantly more expensive than Ubuntu runners (usually 10x).',
-        fix: 'Use ubuntu-latest unless iOS/macOS builds are specifically required.'
+        description: 'macOS runners are significantly more expensive than Ubuntu runners (usually 10x).',
+        fix: 'Use ubuntu-latest unless iOS/macOS builds are specifically required.',
+        suggestion: 'Use ubuntu-latest unless iOS/macOS builds are specifically required.'
       });
     }
 
@@ -18,9 +21,12 @@ export class CostValidator {
     if (!hasTimeout) {
       issues.push({
         type: 'MISSING_TIMEOUT',
+        ruleId: 'COST-002',
         severity: 'HIGH',
         message: 'No timeout-minutes specified. A hanging job could consume excessive CI minutes.',
-        fix: 'Add timeout-minutes: 15 (or appropriate limit) to all jobs.'
+        description: 'No timeout-minutes specified. A hanging job could consume excessive CI minutes.',
+        fix: 'Add timeout-minutes: 15 (or appropriate limit) to all jobs.',
+        suggestion: 'Add timeout-minutes: 15 (or appropriate limit) to all jobs.'
       });
     }
 
