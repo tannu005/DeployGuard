@@ -107,7 +107,7 @@ npm run dev
 
 ---
 
-## 💼 DevSecOps Relevance (AutoRABIT Alignment)
+## 💼 DevSecOps Relevance 
 This project represents standard production challenges faced in modern Salesforce Release Management:
 1. **Pipeline Optimization**: Ensuring deployment workflows are validated before execution, saving expensive cloud compute costs and runner overheads.
 2. **Shift-Left Security**: Automating static analysis audits early in the commit lifecycle, minimizing manual code reviews.
