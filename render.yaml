@@ -1,0 +1,31 @@
+services:
+  - type: web
+    name: deployguard-backend
+    env: node
+    plan: free
+    rootDir: backend
+    buildCommand: npm install && npx prisma generate && npm run build
+    startCommand: node dist/index.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: DATABASE_URL
+        sync: false # Render will prompt you for this value during deployment
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: deployguard-redis
+          property: connectionString
+      - key: STRIPE_SECRET_KEY
+        sync: false # Render will prompt you for this value during deployment
+      - key: STRIPE_PUBLISHABLE_KEY
+        sync: false # Render will prompt you for this value during deployment
+      - key: FRONTEND_URL
+        sync: false # Set this to your Vercel frontend URL after deploying the frontend
+
+  - type: redis
+    name: deployguard-redis
+    plan: free
+    ipAllowList: [] # Restricts access to internal services only
