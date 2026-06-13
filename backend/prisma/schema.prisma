@@ -33,6 +33,7 @@ model User {
 
 model PipelineAnalysis {
   id                          String   @id @default(uuid())
+  userEmail                   String?
   workflowFile                String
   totalIssues                 Int
   criticalIssues              Int

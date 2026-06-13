@@ -19,14 +19,38 @@ router.post('/analyze', async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Either YAML content or a GitHub repository URL is required' });
     }
 
+    if (!email || !email.trim()) {
+      return res.status(400).json({ error: 'Please enter your email in the "Check Active Subscriptions" box on the Pricing page to claim your 5 free scans.' });
+    }
+
     // Lookup plan
     let userPlan = 'FREE';
-    if (email) {
-      const subscription = await prisma.subscription.findUnique({
-        where: { email },
+    const subscription = await prisma.subscription.findUnique({
+      where: { email },
+    });
+    if (subscription && subscription.status === 'ACTIVE') {
+      userPlan = subscription.plan;
+    }
+
+    // Free tier scan limit check (5 scans per calendar month)
+    if (userPlan === 'FREE') {
+      const startOfMonth = new Date();
+      startOfMonth.setDate(1);
+      startOfMonth.setHours(0, 0, 0, 0);
+
+      const scanCount = await prisma.pipelineAnalysis.count({
+        where: {
+          userEmail: email,
+          createdAt: {
+            gte: startOfMonth
+          }
+        }
       });
-      if (subscription && subscription.status === 'ACTIVE') {
-        userPlan = subscription.plan;
+
+      if (scanCount >= 5) {
+        return res.status(403).json({ 
+          error: "🚫 Monthly Free Scan Limit Reached. Unlock unlimited scans, private repo integration, and AI-powered autofocus suggestions by upgrading to Pro.\nJoin hundreds of DevOps engineers deploying with absolute confidence today. Upgrade now on our Pricing page!"
+        });
       }
     }
 
@@ -138,6 +162,7 @@ router.post('/analyze', async (req: Request, res: Response) => {
         await prisma.pipelineAnalysis.create({
           data: {
             id: jobId,
+            userEmail: email,
             workflowFile: filename,
             totalIssues: allIssues.length,
             criticalIssues: critical,
