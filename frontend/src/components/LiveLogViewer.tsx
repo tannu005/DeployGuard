@@ -14,7 +14,9 @@ export function LiveLogViewer({ pipelineId, onComplete }: { pipelineId: string, 
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const ws = new WebSocket('ws://localhost:3001');
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+    const wsUrl = API_URL.replace(/^http/, 'ws');
+    const ws = new WebSocket(wsUrl);
 
     ws.onopen = () => {
       setStatus('CONNECTED');
