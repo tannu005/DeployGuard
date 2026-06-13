@@ -52,6 +52,11 @@ export function handleLogStream(ws: WebSocket, pipelineId: string) {
       clearInterval(interval);
       return;
     }
+    if (ws.readyState !== 1) { // 1 is WebSocket.OPEN
+      isFinished = true;
+      clearInterval(interval);
+      return;
+    }
     if (currentIndex < mockLogs.length) {
       const log = mockLogs[currentIndex];
       ws.send(JSON.stringify({

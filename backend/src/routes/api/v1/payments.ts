@@ -4,7 +4,8 @@ import { PrismaClient } from '@prisma/client';
 
 const router = Router();
 const prisma = new PrismaClient();
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+const stripeKey = process.env.STRIPE_SECRET_KEY || 'sk_test_dummy_key_to_prevent_boot_crash';
+const stripe = new Stripe(stripeKey, {
 } as any);
 
 // Price IDs will be created dynamically on first use
